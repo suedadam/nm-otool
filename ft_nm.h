@@ -24,6 +24,7 @@
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
 #include <mach/mach_types.h>
+#include "libft.h"
 
 typedef struct  s_headertype
 {
