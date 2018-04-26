@@ -6,12 +6,11 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:52:47 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/26 15:43:14 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/26 15:48:12 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm.h"
-#define EMPTYSPACES "                 "
+#include "ft_nm__.h"
 
 /*
 **
@@ -26,48 +25,6 @@
 		uint32_t	reserved;	// reserved
 	};
 */
-
-struct _cpu_type_names {
-  cpu_type_t cputype;
-  const char *cpu_name;
-};
-
-static struct _cpu_type_names cpu_type_names[] = {
-  { CPU_TYPE_I386, "i386" },
-  { CPU_TYPE_X86_64, "x86_64" },
-  { CPU_TYPE_ARM, "arm" },
-  { CPU_TYPE_ARM64, "arm64" }
-};
-
-static const char	*cpu_type_name(cpu_type_t cpu_type)
-{
-	static int	cpu_type_names_size = sizeof(cpu_type_names) /
-				sizeof(struct _cpu_type_names);
-	int			i;
-
-	i = 0;
-	while (i < cpu_type_names_size)
-	{
-		if (cpu_type == cpu_type_names[i].cputype)
-			return (cpu_type_names[i].cpu_name);
-		i++;
-	}
-	return "unknown";
-}
-
-static char			ref_char(char *seg, char *sect)
-{
-	if (!ft_strcmp(seg, "__TEXT"))
-		return ('T');
-	if (!ft_strcmp(sect, "__bss"))
-		return ('b');
-	else if (!ft_strcmp(sect, "__common"))
-		return ('S');
-	else if (!ft_strcmp(sect, "__data"))
-		return ('D');
-	else
-		return ('?');
-}
 
 static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos)
 {
@@ -87,37 +44,6 @@ static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos
 		(*pos)++;
 	}
 	return (EXIT_SUCCESS);
-}
-
-static char 		grab_typec(uint8_t type, uint8_t nsect)
-{
-	uint8_t	ntype;
-
-		// // ntype = ptr->n_type;
-		// if (type & N_STAB)
-		// 	return ('-');
-	ntype = type & N_TYPE;
-	if (ntype == N_UNDF)
-		return ('U');
-	else if (ntype == N_ABS)
-		return ('A');
-	else if (ntype == N_SECT)
-	{
-		if (nsect & NO_SECT)
-			return ('t');
-		else
-		{
-			if (!g_sectnames[nsect])
-				return ('T');
-			return (g_sectnames[nsect]);
-		}
-	}
-	else if (ntype == N_PBUD)
-		return ('P');
-	else if (ntype == N_INDR)
-		return ('I');
-	else
-		return ('?');
 }
 
 static int 			dump_symbols_64(void *data, struct symtab_command *symtable)
@@ -172,7 +98,6 @@ int					mach_64(void *data)
 	struct mach_header_64	*header;
 
 	header = (struct mach_header_64 *)data;
-	printf("%s\n", cpu_type_name(header->cputype));
 	if (header->filetype == MH_OBJECT)
 		printf("Object file!\n");
 	else if (header->filetype == MH_EXECUTE)
