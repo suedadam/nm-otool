@@ -3,16 +3,110 @@
 /*                                                        :::      ::::::::   */
 /*   macho32.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asyed <asyed@student.42.us.org>            +#+  +:+       +#+        */
+/*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:46:53 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/07 19:47:22 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/26 15:44:42 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm.h"
+#include "ft_nm__.h"
+
+static int			dump_section(void *data, void *offset, void *upper, uint8_t *pos)
+{
+	struct section		*sect;
+	int					i;
+
+	sect = offset;
+	while ((void *)sect < (void *)upper && i < MAX_SECT)
+	{
+		if (!sect->size)
+			break ;
+		g_sectnames[*pos] = ref_char(sect->segname, sect->sectname);
+		// printf("----> segment = %s,%s size = %llu (%u %u) %d -> %c\n", sect->segname, sect->sectname, sect->size, sect->align, sect->offset, *pos, g_sectnames[*pos]);
+		// printf("%x\n", *(unsigned char *)(data + sect->offset));
+		// printf("%x\n", *(unsigned char *)(data + sect->offset + 1));
+		sect = ((void *)sect + sizeof(struct section));
+		(*pos)++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+static int 			dump_symbols(void *data, struct symtab_command *symtable)
+{
+	struct nlist	*element;
+	uint32_t		i;
+	uint8_t			type;
+
+	i = 0;
+	element = data + symtable->symoff;
+	while (i < symtable->nsyms)
+	{
+		if (!(element->n_type & N_STAB))
+		{
+			(element->n_value) ? printf("%016llx ", element->n_value) : printf(EMPTYSPACES);
+			printf("%c ", grab_typec(element->n_type, element->n_sect));
+			printf("%s\n", data + symtable->stroff + element->n_un.n_strx);
+		}
+		element++;
+		i++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+static int 	dump_commands(void *data, size_t offset, uint32_t ncmds)
+{
+	struct load_command		*cmd;
+	struct segment_command	*seg;
+	int						i;
+	uint8_t					pos;
+
+	i = 0;
+	pos = 1;
+	while (i < ncmds)
+	{
+		cmd = (struct load_command *)(data + offset);
+		seg = (struct segment_command *)(data + offset);
+		if (cmd->cmd == LC_SEGMENT)
+			dump_section(data, (void *)cmd + sizeof(struct segment_command), (void *)cmd + seg->cmdsize, &pos);
+		else if (cmd->cmd == LC_SYMTAB)
+			dump_symbols(data, (void *)cmd);
+		else if (cmd->cmd == LC_DYSYMTAB)
+			printf("Dynamic symtable\n");
+		offset += cmd->cmdsize;
+		i++;
+	}
+	return (EXIT_SUCCESS);
+}
 
 int	mach_32(void *data)
 {
+	struct mach_header	*header;
+
+	header = (struct mach_header *)data;
+	if (header->filetype == MH_OBJECT)
+		printf("Object file!\n");
+	else if (header->filetype == MH_EXECUTE)
+		printf("Executable\n");
+	else if (header->filetype == MH_EXECUTE)
+		printf("Bundle/Plugin\n");
+	else if (header->filetype == MH_DYLIB)
+		printf("Dynamic library\n");
+	else if (header->filetype == MH_PRELOAD)
+		printf("Preloading patch?\n");
+	else if (header->filetype == MH_CORE)
+		printf("Core files - a/k/a crash files\n");
+	else if (header->filetype == MH_DYLINKER)
+		printf("Dynamic linker library file\n");
+	else if (header->filetype == MH_DSYM)
+		printf("symbol information for file\n");
+	return (dump_commands(data, sizeof(struct mach_header), header->ncmds));
+	// printf("wow 32 bit\n");
+	// return (EXIT_SUCCESS);
+}
+
+int	mach_32_swap(void *data)
+{
+	printf("wow 32 bit swapped\n");
 	return (EXIT_SUCCESS);
 }

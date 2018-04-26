@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   macho64.c                                          :+:      :+:    :+:   */
+/*   macho64_swap.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:52:47 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/26 15:43:14 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/26 15:44:52 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm.h"
-#define EMPTYSPACES "                 "
+#include "ft_nm__.h"
 
 /*
 **
@@ -55,20 +54,6 @@ static const char	*cpu_type_name(cpu_type_t cpu_type)
 	return "unknown";
 }
 
-static char			ref_char(char *seg, char *sect)
-{
-	if (!ft_strcmp(seg, "__TEXT"))
-		return ('T');
-	if (!ft_strcmp(sect, "__bss"))
-		return ('b');
-	else if (!ft_strcmp(sect, "__common"))
-		return ('S');
-	else if (!ft_strcmp(sect, "__data"))
-		return ('D');
-	else
-		return ('?');
-}
-
 static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos)
 {
 	struct section_64	*sect;
@@ -87,37 +72,6 @@ static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos
 		(*pos)++;
 	}
 	return (EXIT_SUCCESS);
-}
-
-static char 		grab_typec(uint8_t type, uint8_t nsect)
-{
-	uint8_t	ntype;
-
-		// // ntype = ptr->n_type;
-		// if (type & N_STAB)
-		// 	return ('-');
-	ntype = type & N_TYPE;
-	if (ntype == N_UNDF)
-		return ('U');
-	else if (ntype == N_ABS)
-		return ('A');
-	else if (ntype == N_SECT)
-	{
-		if (nsect & NO_SECT)
-			return ('t');
-		else
-		{
-			if (!g_sectnames[nsect])
-				return ('T');
-			return (g_sectnames[nsect]);
-		}
-	}
-	else if (ntype == N_PBUD)
-		return ('P');
-	else if (ntype == N_INDR)
-		return ('I');
-	else
-		return ('?');
 }
 
 static int 			dump_symbols_64(void *data, struct symtab_command *symtable)
@@ -167,27 +121,29 @@ static int 			dump_commands_64(void *data, size_t offset, uint32_t ncmds)
 	return (EXIT_SUCCESS);	
 }
 
-int					mach_64(void *data)
+int					mach_64_swap(void *data)
 {
-	struct mach_header_64	*header;
+	// struct mach_header_64	*header;
 
-	header = (struct mach_header_64 *)data;
-	printf("%s\n", cpu_type_name(header->cputype));
-	if (header->filetype == MH_OBJECT)
-		printf("Object file!\n");
-	else if (header->filetype == MH_EXECUTE)
-		printf("Executable\n");
-	else if (header->filetype == MH_EXECUTE)
-		printf("Bundle/Plugin\n");
-	else if (header->filetype == MH_DYLIB)
-		printf("Dynamic library\n");
-	else if (header->filetype == MH_PRELOAD)
-		printf("Preloading patch?\n");
-	else if (header->filetype == MH_CORE)
-		printf("Core files - a/k/a crash files\n");
-	else if (header->filetype == MH_DYLINKER)
-		printf("Dynamic linker library file\n");
-	else if (header->filetype == MH_DSYM)
-		printf("symbol information for file\n");
-	return (dump_commands_64(data, sizeof(struct mach_header_64), header->ncmds));
+	printf("Its a swapped one!\n");
+	return (EXIT_SUCCESS);
+	// header = (struct mach_header_64 *)data;
+	// printf("%s\n", cpu_type_name(header->cputype));
+	// if (header->filetype == MH_OBJECT)
+	// 	printf("Object file!\n");
+	// else if (header->filetype == MH_EXECUTE)
+	// 	printf("Executable\n");
+	// else if (header->filetype == MH_EXECUTE)
+	// 	printf("Bundle/Plugin\n");
+	// else if (header->filetype == MH_DYLIB)
+	// 	printf("Dynamic library\n");
+	// else if (header->filetype == MH_PRELOAD)
+	// 	printf("Preloading patch?\n");
+	// else if (header->filetype == MH_CORE)
+	// 	printf("Core files - a/k/a crash files\n");
+	// else if (header->filetype == MH_DYLINKER)
+	// 	printf("Dynamic linker library file\n");
+	// else if (header->filetype == MH_DSYM)
+	// 	printf("symbol information for file\n");
+	// return (dump_commands_64(data, sizeof(struct mach_header_64), header->ncmds));
 }

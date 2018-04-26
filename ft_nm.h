@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_nm.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asyed <asyed@student.42.us.org>            +#+  +:+       +#+        */
+/*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/20 01:55:18 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/07 19:56:36 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/26 15:43:10 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,12 @@ typedef struct  s_headertype
   int     (*f)(void *data);
 }       t_headertype;
 
+int 	read_file(void *data);
 int		mach_32(void *data);
+int		mach_32_swap(void *data);
 int		mach_64(void *data);
+int		mach_64_swap(void *data);
+int		fat_32(void *data);
 
 // typedef int	cpu_type_t;
 // typedef int	cpu_subtype_t;
@@ -62,5 +66,7 @@ int		mach_64(void *data);
 //   uint32_t  nsects;
 //   uint32_t  flags;
 // };
+
+char	g_sectnames[MAX_SECT + 1];
 
 #endif

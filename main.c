@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asyed <asyed@student.42.us.org>            +#+  +:+       +#+        */
+/*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/20 01:48:32 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/07 19:49:03 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/26 15:04:53 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,21 +21,22 @@
 #include <mach/mach_types.h>
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
+#include <mach-o/fat.h>
 #include <mach/mach_types.h>
 
 t_headertype  headers[] = {
   {MH_MAGIC, mach_32},
-  // {MH_CIGAM, mach_32_swap},
+  {MH_CIGAM, mach_32_swap},
   {MH_MAGIC_64, mach_64},
-  // {MH_CIGAM_64, mach_64_swap},
-  // {FAT_MAGIC, fat_32},
-  // {FAT_CIGAM, fat_32_swap},
+  {MH_CIGAM_64, mach_64_swap},
+  {FAT_MAGIC, fat_32},
+  {FAT_CIGAM, fat_32},
   // {FAT_MAGIC_64, fat_64},
   // {FAT_CIGAM_64, fat_64_swap},
   {0, NULL},
 };
 
-static int read_file(void *data)
+int read_file(void *data)
 {
 	uint32_t	magic;
 	int			i;
@@ -45,7 +46,10 @@ static int read_file(void *data)
 	while (headers[i].magic)
 	{
 		if (headers[i].magic == magic)
+		{
+			printf("magic = %x\n", magic);
 			return ((*headers[i].f)(data));
+		}
 		i++;
 	}
 	printf("Unsupported mode %x\n", magic);
