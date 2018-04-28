@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:52:47 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/27 18:27:53 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 18:44:01 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,29 +32,15 @@ static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos
 	int					i;
 
 	sect = offset;
-	// printf("%p < %p\n", );
 	while ((void *)sect < (void *)upper && *pos < MAX_SECT)
 	{
 		if (!sect->size)
 			break ;
-		// printf("pos = %d ", *pos);
-		// if ((g_sectnames[*pos] = ref_char(sect->segname, sect->sectname)) != 'T' && g_sectnames[*pos] != '?')
-			// printf("\n");
 		g_sectnames[*pos] = ref_char(sect->segname, sect->sectname);
-		// printf("----> segment = %s,%s size = %llu (%u %u) %d -> %c\n", sect->segname, sect->sectname, sect->size, sect->align, sect->offset, *pos, g_sectnames[*pos]);
-		// printf("%x\n", *(unsigned char *)(data + sect->offset));
-		// printf("%x\n", *(unsigned char *)(data + sect->offset + 1));
 		sect = ((void *)sect + sizeof(struct section_64));
 		(*pos)++;
 	}
 	return (EXIT_SUCCESS);
-}
-
-int 				sym_sort(t_symsort *old, t_symsort *new)
-{
-	if (ft_strcmp(old->name, new->name) > 0)
-		return (0);
-	return (1);
 }
 
 static int 			dump_symbols_64(void *data, struct symtab_command *symtable, t_pqueue *queue)
@@ -73,30 +59,11 @@ static int 			dump_symbols_64(void *data, struct symtab_command *symtable, t_pqu
 			sym.addr = element->n_value;
 			sym.typechar = grab_typec(element->n_type, element->n_sect);
 			sym.name = data + symtable->stroff + element->n_un.n_strx;
-			ft_enpqueue(queue, &sym, sizeof(t_symsort), (int (*)(void *, void *))&sym_sort);
-			// (element->n_value) ? printf("%016llx ", element->n_value) : printf(EMPTYSPACES);
-			// printf("%c ", grab_typec(element->n_type, element->n_sect));
-			// printf("%s %d\n", data + symtable->stroff + element->n_un.n_strx, element->n_sect);
+			ft_enpqueue(queue, &sym, sizeof(t_symsort), (int (*)(void *, void *))sym_sort);
 		}
 		element++;
 		i++;
 	}
-	return (EXIT_SUCCESS);
-}
-
-static int 			print_symbols(t_pqueue *queue)
-{
-	t_symsort	*sym;
-
-	if (!queue)
-		return (EXIT_FAILURE);
-	while ((sym = ft_depqueue(queue)))
-	{
-		(sym->addr) ? printf("%016llx ", sym->addr) : printf(EMPTYSPACES);
-		printf("%c ", sym->typechar);
-		printf("%s\n", sym->name);
-	}
-	free(queue);
 	return (EXIT_SUCCESS);
 }
 

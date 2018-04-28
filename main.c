@@ -6,11 +6,11 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/20 01:48:32 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/26 15:04:53 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 18:51:18 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm.h"
+#include "ft_nm__.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -64,6 +64,7 @@ int	main(int argc, char *argv[])
 
 	if (argc < 2)
 		return (EXIT_SUCCESS);
+	parse_flags(argc, argv);
 	if ((fd = open(argv[1], O_RDONLY)) == -1
 		|| fstat(fd, &st_buf) == -1
 		|| (data = mmap(NULL, st_buf.st_size, PROT_READ, MAP_SHARED | MAP_FILE, fd, 0)) == (void *)-1)

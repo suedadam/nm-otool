@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:46:53 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/26 15:44:42 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 18:34:12 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,18 @@ static int			dump_section(void *data, void *offset, void *upper, uint8_t *pos)
 		if (!sect->size)
 			break ;
 		g_sectnames[*pos] = ref_char(sect->segname, sect->sectname);
-		// printf("----> segment = %s,%s size = %llu (%u %u) %d -> %c\n", sect->segname, sect->sectname, sect->size, sect->align, sect->offset, *pos, g_sectnames[*pos]);
-		// printf("%x\n", *(unsigned char *)(data + sect->offset));
-		// printf("%x\n", *(unsigned char *)(data + sect->offset + 1));
 		sect = ((void *)sect + sizeof(struct section));
 		(*pos)++;
 	}
 	return (EXIT_SUCCESS);
 }
 
-static int 			dump_symbols(void *data, struct symtab_command *symtable)
+static int 			dump_symbols(void *data, struct symtab_command *symtable, t_pqueue *queue)
 {
 	struct nlist	*element;
 	uint32_t		i;
 	uint8_t			type;
+	t_symsort		sym;
 
 	i = 0;
 	element = data + symtable->symoff;
@@ -44,9 +42,10 @@ static int 			dump_symbols(void *data, struct symtab_command *symtable)
 	{
 		if (!(element->n_type & N_STAB))
 		{
-			(element->n_value) ? printf("%016llx ", element->n_value) : printf(EMPTYSPACES);
-			printf("%c ", grab_typec(element->n_type, element->n_sect));
-			printf("%s\n", data + symtable->stroff + element->n_un.n_strx);
+			sym.addr = element->n_value;
+			sym.typechar = grab_typec(element->n_type, element->n_sect);
+			sym.name = data + symtable->stroff + element->n_un.n_strx;
+			ft_enpqueue(queue, &sym, sizeof(t_symsort), (int (*)(void *, void *))&sym_sort);
 		}
 		element++;
 		i++;
@@ -60,9 +59,12 @@ static int 	dump_commands(void *data, size_t offset, uint32_t ncmds)
 	struct segment_command	*seg;
 	int						i;
 	uint8_t					pos;
+	t_pqueue				*queue;
 
 	i = 0;
 	pos = 1;
+	if (!(queue = init_pqueue()))
+		return (EXIT_FAILURE);
 	while (i < ncmds)
 	{
 		cmd = (struct load_command *)(data + offset);
@@ -70,7 +72,7 @@ static int 	dump_commands(void *data, size_t offset, uint32_t ncmds)
 		if (cmd->cmd == LC_SEGMENT)
 			dump_section(data, (void *)cmd + sizeof(struct segment_command), (void *)cmd + seg->cmdsize, &pos);
 		else if (cmd->cmd == LC_SYMTAB)
-			dump_symbols(data, (void *)cmd);
+			dump_symbols(data, (void *)cmd, queue);
 		else if (cmd->cmd == LC_DYSYMTAB)
 			printf("Dynamic symtable\n");
 		offset += cmd->cmdsize;
@@ -101,8 +103,6 @@ int	mach_32(void *data)
 	else if (header->filetype == MH_DSYM)
 		printf("symbol information for file\n");
 	return (dump_commands(data, sizeof(struct mach_header), header->ncmds));
-	// printf("wow 32 bit\n");
-	// return (EXIT_SUCCESS);
 }
 
 int	mach_32_swap(void *data)

@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 15:38:35 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/27 18:28:00 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 18:40:49 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,22 +24,6 @@ char	ref_char(char *seg, char *sect)
 		return ('C');
 	else
 		return ('S');
-	// if (!ft_strcmp(sect, "__text"))
-	// {
-	// 	printf("sect = %s\n", sect);
-	// 	return ('T');
-	// }
-	// if (!ft_strcmp(sect, "__bss"))
-	// 	return ('B');
-	// else if (!ft_strcmp(sect, "__common") || !ft_strcmp(sect, "__const") || !ft_strcmp(seg, "__TEXT"))
-	// 	return ('S');
-	// else if (!ft_strcmp(sect, "__data"))
-	// 	return ('D');
-	// else
-	// {
-	// 	printf("seg = %s sect = %s\n", seg, sect);
-	// 	return ('?');
-	// }
 }
 
 char	grab_typec(uint8_t type, uint8_t nsect)
@@ -63,8 +47,6 @@ char	grab_typec(uint8_t type, uint8_t nsect)
 		{
 			if (!g_sectnames[nsect])
 				return ('T' + ext);
-			// if (g_sectnames[nsect] == '?')
-				// printf("nsect = %d\n",nsect );
 			return (g_sectnames[nsect] + ext);
 		}
 	}
@@ -74,4 +56,21 @@ char	grab_typec(uint8_t type, uint8_t nsect)
 		return ('I' + ext);
 	else
 		return ('?');
+}
+
+int 	print_symbols(t_pqueue *queue)
+{
+	t_symsort	*sym;
+
+	if (!queue)
+		return (EXIT_FAILURE);
+	while ((sym = ft_depqueue(queue)))
+	{
+		(sym->addr) ? printf("%016llx ", sym->addr) : printf(EMPTYSPACES);
+		printf("%c ", sym->typechar);
+		printf("%s\n", sym->name);
+		free(sym);
+	}
+	free(queue);
+	return (EXIT_SUCCESS);
 }
