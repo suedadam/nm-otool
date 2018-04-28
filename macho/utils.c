@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 15:38:35 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/27 18:40:49 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 19:02:03 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,10 @@ char	grab_typec(uint8_t type, uint8_t nsect)
 	if (type & N_EXT)
 		ext = 0;
 	ntype = type & N_TYPE;
-	if (ntype == N_UNDF)
-		return ('U' + ext);
-	else if (ntype == N_ABS)
+	ntype &= ~N_EXT;
+	// if (ntype == N_UNDF)
+	// 	return ('U' + ext);
+	if (ntype == N_ABS)
 		return ('A' + ext);
 	else if (ntype == N_SECT)
 	{
