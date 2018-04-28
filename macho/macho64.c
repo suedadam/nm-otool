@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:52:47 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/26 15:48:12 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 18:27:53 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,14 @@ static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos
 	int					i;
 
 	sect = offset;
-	while ((void *)sect < (void *)upper && i < MAX_SECT)
+	// printf("%p < %p\n", );
+	while ((void *)sect < (void *)upper && *pos < MAX_SECT)
 	{
 		if (!sect->size)
 			break ;
+		// printf("pos = %d ", *pos);
+		// if ((g_sectnames[*pos] = ref_char(sect->segname, sect->sectname)) != 'T' && g_sectnames[*pos] != '?')
+			// printf("\n");
 		g_sectnames[*pos] = ref_char(sect->segname, sect->sectname);
 		// printf("----> segment = %s,%s size = %llu (%u %u) %d -> %c\n", sect->segname, sect->sectname, sect->size, sect->align, sect->offset, *pos, g_sectnames[*pos]);
 		// printf("%x\n", *(unsigned char *)(data + sect->offset));
@@ -46,11 +50,19 @@ static int			dump_section_64(void *data, void *offset, void *upper, uint8_t *pos
 	return (EXIT_SUCCESS);
 }
 
-static int 			dump_symbols_64(void *data, struct symtab_command *symtable)
+int 				sym_sort(t_symsort *old, t_symsort *new)
+{
+	if (ft_strcmp(old->name, new->name) > 0)
+		return (0);
+	return (1);
+}
+
+static int 			dump_symbols_64(void *data, struct symtab_command *symtable, t_pqueue *queue)
 {
 	struct nlist_64	*element;
 	uint32_t		i;
 	uint8_t			type;
+	t_symsort		sym;
 
 	i = 0;
 	element = data + symtable->symoff;
@@ -58,13 +70,33 @@ static int 			dump_symbols_64(void *data, struct symtab_command *symtable)
 	{
 		if (!(element->n_type & N_STAB))
 		{
-			(element->n_value) ? printf("%016llx ", element->n_value) : printf(EMPTYSPACES);
-			printf("%c ", grab_typec(element->n_type, element->n_sect));
-			printf("%s\n", data + symtable->stroff + element->n_un.n_strx);
+			sym.addr = element->n_value;
+			sym.typechar = grab_typec(element->n_type, element->n_sect);
+			sym.name = data + symtable->stroff + element->n_un.n_strx;
+			ft_enpqueue(queue, &sym, sizeof(t_symsort), (int (*)(void *, void *))&sym_sort);
+			// (element->n_value) ? printf("%016llx ", element->n_value) : printf(EMPTYSPACES);
+			// printf("%c ", grab_typec(element->n_type, element->n_sect));
+			// printf("%s %d\n", data + symtable->stroff + element->n_un.n_strx, element->n_sect);
 		}
 		element++;
 		i++;
 	}
+	return (EXIT_SUCCESS);
+}
+
+static int 			print_symbols(t_pqueue *queue)
+{
+	t_symsort	*sym;
+
+	if (!queue)
+		return (EXIT_FAILURE);
+	while ((sym = ft_depqueue(queue)))
+	{
+		(sym->addr) ? printf("%016llx ", sym->addr) : printf(EMPTYSPACES);
+		printf("%c ", sym->typechar);
+		printf("%s\n", sym->name);
+	}
+	free(queue);
 	return (EXIT_SUCCESS);
 }
 
@@ -74,9 +106,12 @@ static int 			dump_commands_64(void *data, size_t offset, uint32_t ncmds)
 	struct segment_command_64	*seg;
 	int							i;
 	uint8_t						pos;
+	t_pqueue					*queue;
 
 	i = 0;
 	pos = 1;
+	if (!(queue = init_pqueue()))
+		return (EXIT_FAILURE);
 	while (i < ncmds)
 	{ 
 		cmd = (struct load_command	*)(data + offset);
@@ -84,13 +119,13 @@ static int 			dump_commands_64(void *data, size_t offset, uint32_t ncmds)
 		if (cmd->cmd == LC_SEGMENT_64)
 			dump_section_64(data, (void *)cmd + sizeof(struct segment_command_64), (void *)cmd + seg->cmdsize, &pos);
 		else if (cmd->cmd == LC_SYMTAB)
-			dump_symbols_64(data, (void *)cmd);
+			dump_symbols_64(data, (void *)cmd, queue);
 		else if (cmd->cmd == LC_DYSYMTAB)
 			printf("Dynamic symtable\n");
 		offset += cmd->cmdsize;
 		i++;
 	}
-	return (EXIT_SUCCESS);	
+	return (print_symbols(queue));
 }
 
 int					mach_64(void *data)

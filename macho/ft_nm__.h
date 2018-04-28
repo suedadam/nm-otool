@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 15:40:39 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/26 15:44:30 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/27 17:32:09 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,14 @@
 # include "libft.h"
 # include "ft_nm.h"
 # define EMPTYSPACES "                 "
+
+typedef struct	s_symsort
+{
+	uint64_t	addr;
+	char		typechar;
+	char		*name;	
+}				t_symsort;
+
 /*
 ** utils
 */
