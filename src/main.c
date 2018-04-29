@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/20 01:48:32 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 16:49:03 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:55:38 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,8 @@ int	parse_files(int argc, char *argv[])
 		if ((fd = open(argv[i], O_RDONLY)) == -1
 			|| fstat(fd, &st_buf) == -1
 			|| (data = mmap(NULL, st_buf.st_size, PROT_READ,
-				MAP_SHARED | MAP_FILE, fd, 0)) == (void *)-1)
-			return (EXIT_FAILURE);
-		if ((ret = read_file(data)) == EXIT_FAILURE)
+				MAP_SHARED | MAP_FILE, fd, 0)) == (void *)-1
+			|| (ret = read_file(data)) == EXIT_FAILURE)
 			ft_printf("Error: \"%s\"\n", ft_strerror(errno));
 		close(fd);
 		munmap(data, st_buf.st_size);
