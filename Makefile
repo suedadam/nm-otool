@@ -1,10 +1,10 @@
 NAME = ft_nm
-CFLAGS += -Wall -Werror -Wextra -g -fsanitize=address
+OTOOLNAME = ft_otool
+CFLAGS += -Wall -Werror -Wextra
 INCLUDES = 	-I deps/libft/inc \
 			-I inc
 CC = gcc
-LIBFT = libftprintf.a
-
+LIBFT = libftprintf.a 
 ################################################################################
 # Source directories identifiers                                               #
 ################################################################################
@@ -38,7 +38,6 @@ SRC =	\
 	macho64_swap \
 	sort \
 	utils \
-	archivelib_64
 
 ################################################################################
 # RULES                                                                        #
@@ -46,10 +45,16 @@ SRC =	\
 
 all: $(NAME)
 
+
+$(OTOOLNAME): CFLAGS += -DOTOOL
+$(OTOOLNAME): clean $(LIBFT) $(OBJSRC)
+	@ echo "$(YELLOW)Compiling program...$(RES)"
+	$(CC) main.c $(CFLAGS) -L deps/libft -lftprintf $(MALLOC_PATH) $(INCLUDES) $(OBJSRC) -o $(OTOOLNAME)
+	@ echo "$(GREEN)$(OTOOLNAME) binary ready$(RES)"
+
 $(NAME): $(LIBFT) $(OBJSRC)
 	@ echo "$(YELLOW)Compiling program...$(RES)"
 	$(CC) main.c $(CFLAGS) -L deps/libft -lftprintf $(MALLOC_PATH) $(INCLUDES) $(OBJSRC) -o $(NAME)
-	# install_name_tool -change $(MALLOC) $(MALLOC_PATH) $(NAME)
 	@ echo "$(GREEN)$(NAME) binary ready$(RES)"
 
 $(LIBFT):
@@ -65,6 +70,7 @@ clean:
 
 fclean: clean
 	/bin/rm -f $(NAME)
+	/bin/rm -f $(OTOOLNAME)
 	make -C deps/libft fclean
 	@ echo "$(RED)Removing library file and binary...$(RES)"
 
