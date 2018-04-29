@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/20 01:48:32 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 13:21:17 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:31:29 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ t_headertype  headers[] = {
   {FAT_CIGAM, fat_32},
   {FAT_MAGIC_64, fat_64},
   {FAT_CIGAM_64, fat_64_swap},
-  // {STATIC_LIB, archivelib_64},
   {0, NULL},
 };
 
@@ -55,12 +54,36 @@ int read_file(void *data)
 	return (EXIT_FAILURE);
 }
 
-int	main(int argc, char *argv[])
+int parse_files(int argc, char *argv[])
 {
 	int			fd;
 	int8_t		ret;
 	struct stat	st_buf;
 	void		*data;
+	int			i;
+
+	i = 1;
+	while (i < argc)
+	{
+		ft_printf("\n%s:\n", argv[i]);
+		if ((fd = open(argv[i], O_RDONLY)) == -1
+			|| fstat(fd, &st_buf) == -1
+			|| (data = mmap(NULL, st_buf.st_size, PROT_READ, MAP_SHARED | MAP_FILE, fd, 0)) == (void *)-1)
+			return (EXIT_FAILURE);
+		if ((ret = read_file(data)) == EXIT_FAILURE)
+			ft_printf("Error: \"%s\"\n", ft_strerror(errno));
+		close(fd);
+		munmap(data, st_buf.st_size);
+		if (ret == EXIT_FAILURE)
+			return (ret);
+		i++;
+	}
+	return (ret);
+}
+
+int	main(int argc, char *argv[])
+{
+	int	ret;
 
 	if (argc < 2)
 		return (EXIT_SUCCESS);
@@ -69,13 +92,5 @@ int	main(int argc, char *argv[])
 		ft_printf("Error: \"%s\"\n", ft_strerror(errno));
 		return (ret);
 	}
-	if ((fd = open(argv[1], O_RDONLY)) == -1
-		|| fstat(fd, &st_buf) == -1
-		|| (data = mmap(NULL, st_buf.st_size, PROT_READ, MAP_SHARED | MAP_FILE, fd, 0)) == (void *)-1)
-		return (EXIT_FAILURE);
-	if ((ret = read_file(data)) == EXIT_FAILURE)
-		ft_printf("Error: \"%s\"\n", ft_strerror(errno));
-	close(fd);
-	munmap(data, st_buf.st_size);
-	return (ret);
+	return (parse_files(argc, argv));
 }

@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:46:53 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 15:57:05 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:22:11 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,9 @@ static int	dump_commands(void *data, size_t offset, uint32_t ncmds)
 	struct segment_command	*seg;
 	uint32_t				i;
 	uint8_t					pos;
-	t_pqueue				*queue;
 
 	i = 0;
 	pos = 1;
-	if (!(queue = init_pqueue()))
-		return (EXIT_FAILURE);
 	while (i < ncmds)
 	{
 		cmd = (struct load_command *)(data + offset);
@@ -78,12 +75,12 @@ static int	dump_commands(void *data, size_t offset, uint32_t ncmds)
 		offset += ntohl(cmd->cmdsize);
 		i++;
 	}
-	return (print_symbols(queue));
+	return (EXIT_SUCCESS);
 }
 
 #else
 
-static int	dump_section(__attribute__((unused)) void *data, void *offset, void *upper, uint8_t *pos)
+static int	dump_section(void *offset, void *upper, uint8_t *pos)
 {
 	struct section		*sect;
 
@@ -92,7 +89,7 @@ static int	dump_section(__attribute__((unused)) void *data, void *offset, void *
 	{
 		if (!sect->size)
 			break ;
-		g_sectnames[*pos] = ref_char(sect->segname, sect->sectname);
+		g_sectnames[*pos] = ref_char(sect->sectname);
 		sect = ((void *)sect + sizeof(struct section));
 		(*pos)++;
 	}
@@ -144,8 +141,7 @@ static int	dump_commands(void *data, size_t offset, uint32_t ncmds)
 		cmd = (struct load_command *)(data + offset);
 		seg = (struct segment_command *)(data + offset);
 		if (cmd->cmd == htonl(LC_SEGMENT))
-			dump_section(data,
-				(void *)cmd + sizeof(struct segment_command),
+			dump_section((void *)cmd + sizeof(struct segment_command),
 				(void *)cmd + ntohl(seg->cmdsize), &pos);
 		else if (cmd->cmd == htonl(LC_SYMTAB))
 			dump_symbols(data, (void *)cmd, queue);

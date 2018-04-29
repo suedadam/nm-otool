@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/27 18:36:01 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 15:59:11 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:09:04 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ int		addr_sort(t_symsort *old, t_symsort *new)
 		return (0);
 	return (1);
 }
-
 
 int		pick_sort(char c)
 {

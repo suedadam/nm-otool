@@ -3,6 +3,7 @@ OTOOLNAME = ft_otool
 CFLAGS += -Wall -Werror -Wextra
 INCLUDES = 	-I deps/libft/inc \
 			-I inc
+CLEANOBJS = 
 CC = gcc
 LIBFT = libftprintf.a 
 ################################################################################
@@ -47,12 +48,12 @@ all: $(NAME)
 
 
 $(OTOOLNAME): CFLAGS += -DOTOOL
-$(OTOOLNAME): clean $(LIBFT) $(OBJSRC)
+$(OTOOLNAME): $(CLEANOBJS) $(LIBFT) $(OBJSRC)
 	@ echo "$(YELLOW)Compiling program...$(RES)"
 	$(CC) main.c $(CFLAGS) -L deps/libft -lftprintf $(MALLOC_PATH) $(INCLUDES) $(OBJSRC) -o $(OTOOLNAME)
 	@ echo "$(GREEN)$(OTOOLNAME) binary ready$(RES)"
 
-$(NAME): $(LIBFT) $(OBJSRC)
+$(NAME): $(CLEANOBJS) $(LIBFT) $(OBJSRC)
 	@ echo "$(YELLOW)Compiling program...$(RES)"
 	$(CC) main.c $(CFLAGS) -L deps/libft -lftprintf $(MALLOC_PATH) $(INCLUDES) $(OBJSRC) -o $(NAME)
 	@ echo "$(GREEN)$(NAME) binary ready$(RES)"
@@ -60,11 +61,13 @@ $(NAME): $(LIBFT) $(OBJSRC)
 $(LIBFT):
 	make -C deps/libft
 
+$(CLEANOBJS):
+	/bin/rm -f $(OBJSRC)
+
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-clean:
-	/bin/rm -f $(OBJSRC)
+clean: $(CLEANOBJS)
 	make -C deps/libft clean
 	@ echo "$(RED)Cleaning folders of object files...$(RES)"
 

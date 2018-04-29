@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 15:40:39 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/28 20:29:40 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:10:54 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,10 @@ typedef struct	s_symsort
 }				t_symsort;
 
 /*
-** fat
-*/
-int		parse_fat(void *data, struct fat_arch *fat);
-
-/*
 ** utils
 */
 
-char	ref_char(char *seg, char *sect);
+char	ref_char(char *sect);
 char	grab_typec(uint8_t type, uint8_t nsect, uint64_t value);
 int		(*sym_sort)(t_symsort *old, t_symsort *new);
 int 	print_symbols(t_pqueue *queue);

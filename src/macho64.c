@@ -6,7 +6,7 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:52:47 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 15:57:44 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:19:45 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static int	dump_section_64(void *data, void *offset, void *upper, uint8_t *pos)
 			!ft_strcmp(sect->sectname, "__text"))
 			return (print_section(data, sect));
 		sect = ((void *)sect + sizeof(struct section_64));
+		(*pos)++;
 	}
 	return (EXIT_SUCCESS);
 }
@@ -60,12 +61,9 @@ static int	dump_commands_64(void *data, size_t offset, uint32_t ncmds)
 	struct segment_command_64	*seg;
 	uint32_t					i;
 	uint8_t						pos;
-	t_pqueue					*queue;
 
 	i = 0;
 	pos = 1;
-	if (!(queue = init_pqueue()))
-		return (EXIT_FAILURE);
 	while (i < ncmds)
 	{
 		cmd = (struct load_command	*)(data + offset);
@@ -82,7 +80,7 @@ static int	dump_commands_64(void *data, size_t offset, uint32_t ncmds)
 
 #else
 
-static int	dump_section_64(__attribute__((unused))void *data, void *offset, void *upper, uint8_t *pos)
+static int	dump_section_64(void *offset, void *upper, uint8_t *pos)
 {
 	struct section_64	*sect;
 
@@ -91,7 +89,7 @@ static int	dump_section_64(__attribute__((unused))void *data, void *offset, void
 	{
 		if (!sect->size)
 			break ;
-		g_sectnames[*pos] = ref_char(sect->segname, sect->sectname);
+		g_sectnames[*pos] = ref_char(sect->sectname);
 		sect = ((void *)sect + sizeof(struct section_64));
 		(*pos)++;
 	}
@@ -142,8 +140,7 @@ static int	dump_commands_64(void *data, size_t offset, uint32_t ncmds)
 		cmd = (struct load_command	*)(data + offset);
 		seg = (struct segment_command_64 *)(data + offset);
 		if (cmd->cmd == LC_SEGMENT_64)
-			dump_section_64(data,
-				(void *)cmd + sizeof(struct segment_command_64),
+			dump_section_64((void *)cmd + sizeof(struct segment_command_64),
 				(void *)cmd + seg->cmdsize, &pos);
 		else if (cmd->cmd == LC_SYMTAB)
 			dump_symbols_64(data, (void *)cmd, queue);

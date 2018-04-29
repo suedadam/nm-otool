@@ -6,13 +6,13 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 15:38:35 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/28 20:43:48 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:11:41 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm__.h"
 
-char	ref_char(__attribute__((unused)) char *seg, char *sect)
+char	ref_char(char *sect)
 {
 	if (!ft_strcmp(sect, SECT_TEXT))
 		return ('T');
@@ -50,7 +50,7 @@ char	grab_typec(uint8_t type, uint8_t nsect, uint64_t value)
 		return ('?');
 }
 
-int 	print_symbols(t_pqueue *queue)
+int		print_symbols(t_pqueue *queue)
 {
 	t_symsort	*sym;
 
