@@ -6,11 +6,11 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/07 19:52:47 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 16:19:38 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:44:15 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm__.h"
+#include "ft_nm_int.h"
 
 #ifdef OTOOL
 
@@ -116,7 +116,7 @@ static int	dump_symbols_64(void *data,
 					htonl(element->n_un.n_strx);
 			ft_enpqueue(queue, &sym,
 				sizeof(t_symsort),
-				(int (*)(void *, void *))sym_sort);
+				(int (*)(void *, void *))g_sym_sort);
 		}
 		element++;
 		i++;

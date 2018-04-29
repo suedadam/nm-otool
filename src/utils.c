@@ -6,11 +6,11 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 15:38:35 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 16:11:41 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:44:05 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm__.h"
+#include "ft_nm_int.h"
 
 char	ref_char(char *sect)
 {

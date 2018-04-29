@@ -6,11 +6,11 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/27 18:36:01 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 16:09:04 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:44:11 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm__.h"
+#include "ft_nm_int.h"
 
 int		alpha_sort(t_symsort *old, t_symsort *new)
 {
@@ -42,10 +42,10 @@ int		addr_sort(t_symsort *old, t_symsort *new)
 int		pick_sort(char c)
 {
 	if (c == 'r')
-		sym_sort = &rev_alpha_sort;
+		g_sym_sort = &rev_alpha_sort;
 	else if (c == 'n')
-		sym_sort = &addr_sort;
+		g_sym_sort = &addr_sort;
 	else
-		sym_sort = &alpha_sort;
+		g_sym_sort = &alpha_sort;
 	return (EXIT_SUCCESS);
 }

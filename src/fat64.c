@@ -6,11 +6,11 @@
 /*   By: asyed <asyed@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/26 14:35:43 by asyed             #+#    #+#             */
-/*   Updated: 2018/04/29 16:09:39 by asyed            ###   ########.fr       */
+/*   Updated: 2018/04/29 16:44:27 by asyed            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_nm__.h"
+#include "ft_nm_int.h"
 
 static int	parse_fat_64(void *data, struct fat_arch_64 *fat)
 {
